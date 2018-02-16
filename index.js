@@ -2,6 +2,8 @@
 const path = require('path');
 
 const cleanrequire = (libpath) => {
+  if (!/^[./]/.test(libpath)) return removeCacheAndLoad(libpath);
+
   const
     err = new Error(''),
     { stack } = err,
@@ -10,8 +12,14 @@ const cleanrequire = (libpath) => {
     firstMatch = stack.substring(firstI, secndI).match(/\s+\(?(\/([^:]+):\d+)/),
     libFile = '/' + path.join(path.dirname(firstMatch[2]), libpath);
 
-  delete require.cache[require.resolve(libFile)];
-  return require(libFile);
+  return removeCacheAndLoad(libFile);
+};
+
+const removeCacheAndLoad = (libFile) => {
+  const resolved = require.resolve(libFile);
+  if (resolved in require.cache) delete require.cache[resolved];
+
+  return require(resolved);
 };
 
 module.exports = cleanrequire;
