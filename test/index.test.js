@@ -7,6 +7,17 @@ const
   { expect } = require('chai'),
   cleanrequire = require('../');
 
+describe('firstMatchOrCWD', () => {
+  it('shoud return Current Working Directory when input is not an Array', () => {
+    const { firstMatchOrCWD } = cleanrequire;
+
+    const res      = firstMatchOrCWD(null);
+    const expected = process.cwd();
+    
+    expect(res).to.equal(expected);
+  });
+});
+
 describe('require', () => {
   it('require should cache and return cached version on the second call', (done) => {
     const datetimeA = cleanrequire('./resources/datetime');

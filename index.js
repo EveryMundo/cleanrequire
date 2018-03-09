@@ -1,8 +1,11 @@
 'use strict';
 const path = require('path');
 
+const firstMatchOrCWD = (firstMatch) =>
+  Array.isArray(firstMatch) ? path.dirname(firstMatch[2]) : process.cwd();
+
 const cleanrequire = (libpath) => {
-  if (!/^[./]/.test(libpath)) return removeCacheAndLoad(libpath);
+  if (!/^\./.test(libpath)) return removeCacheAndLoad(libpath);
 
   const
     err = new Error(''),
@@ -10,7 +13,10 @@ const cleanrequire = (libpath) => {
     firstI = stack.indexOf('\n', stack.indexOf('\n') + 1),
     secndI = (stack + '\n').indexOf('\n', firstI + 1),
     firstMatch = stack.substring(firstI, secndI).match(/\s+\(?(\/([^:]+):\d+)/),
-    libFile = '/' + path.join(path.dirname(firstMatch[2]), libpath);
+    // baseDir = firstMatch ? path.dirname(firstMatch[2]) : process.cwd();
+    baseDir = firstMatchOrCWD(firstMatch);
+
+  const libFile = '/' + path.join(baseDir, libpath).replace(/^\//, '');
 
   return removeCacheAndLoad(libFile);
 };
@@ -21,5 +27,7 @@ const removeCacheAndLoad = (libFile) => {
 
   return require(resolved);
 };
+
+cleanrequire.firstMatchOrCWD = firstMatchOrCWD;
 
 module.exports = cleanrequire;
