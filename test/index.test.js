@@ -5,6 +5,7 @@
 
 const
   { expect } = require('chai'),
+  sinon      = require('sinon'),
   cleanrequire = require('../');
 
 describe('firstMatchOrCWD', () => {
@@ -15,6 +16,40 @@ describe('firstMatchOrCWD', () => {
     const expected = process.cwd();
     
     expect(res).to.equal(expected);
+  });
+});
+
+describe('prependSlash', () => {
+  context('NOT running on windows', () => {
+    it('shoud return a string prepended by a slash', () => {
+      const { prependSlash } = cleanrequire;
+
+      const input = 'C:\\path\\another-path';
+      const expected = `/${input}`;
+      const res = prependSlash(input);
+
+      expect(res).to.equal(expected);
+    });
+  });
+
+  context('running on windows', () => {
+    const os = require('os');
+    beforeEach(() => {
+      sinon.stub(os, 'platform').callsFake(() => 'win32');
+    });
+
+    afterEach(() => {
+      os.platform.restore();
+    });
+
+    it('shoud return the exact same string without prepending the slash', () => {
+      const { prependSlash } = cleanrequire;
+  
+      const input = 'C:\\path\\another-path';
+      const res = prependSlash(input);
+  
+      expect(res).to.equal(input);
+    });
   });
 });
 
