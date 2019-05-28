@@ -1,6 +1,6 @@
 {
   "name": "@everymundo/cleanrequire",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Cleans nodejs require.cache for a given module and requires it again. Very useful for testing purposes.",
   "main": "index.js",
   "scripts": {
